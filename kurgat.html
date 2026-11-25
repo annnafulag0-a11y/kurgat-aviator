@@ -3,465 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KURGAT - Game</title>
+    <title>KURGAT - UI Simulation</title>
     <style>
-        /* Basic Reset */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #121212;
-            color: white;
-            display: flex;
-            justify-content: center;
-        }
-
-        /* Mobile Container */
-        .app-container {
-            width: 100%;
-            max-width: 450px;
-            background-color: #1a1d21;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        /* Top Header */
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            background-color: #0f1114;
-            font-size: 14px;
-            border-bottom: 1px solid #2a2e33;
-        }
-
-        .back-btn {
-            color: #a0a0a0;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-        }
-
-        .back-btn span {
-            margin-left: 5px;
-        }
-
-        .fullscreen-btn {
-            color: #a0a0a0;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Sub Header (Balance & History) */
-        .sub-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            background-color: #1a1d21;
-        }
-
-        .plane-icon {
-            color: #e02434;
-            font-size: 20px;
-        }
-
-        .balance {
-            color: #4ade80;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .history-bar {
-            display: flex;
-            gap: 10px;
-            padding: 10px 15px;
-            background-color: #1a1d21;
-            font-size: 12px;
-            overflow-x: auto;
-            border-bottom: 1px solid #2a2e33;
-        }
-
-        .history-item {
-            color: #8b5cf6;
-        }
-
-        .history-item:nth-child(odd) {
-            color: #3b82f6;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: #121212; color: white; display: flex; justify-content: center; }
         
-        .history-item:nth-child(3n) {
-            color: #f59e0b;
-        }
+        .app-container { width: 100%; max-width: 400px; background-color: #1a1d21; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .header { display: flex; justify-content: space-between; padding: 15px; background-color: #0f1114; font-size: 14px; }
+        .balance { color: #4ade80; font-weight: bold; }
 
-        /* Main Game Area */
         .game-area {
+            height: 300px;
             background: radial-gradient(circle, #2a2e33 0%, #0a0a0a 100%);
-            height: 250px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
-            border-bottom: 2px solid #2a2e33;
+            overflow: hidden;
         }
 
-        /* KURGAT Branding */
-        .brand-title {
-            font-size: 36px;
+        .multiplier-display {
+            font-size: 48px;
             font-weight: 900;
-            color: #e02434;
-            font-style: italic;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .brand-subtitle {
-            font-size: 14px;
-            font-weight: bold;
             color: #fff;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
+            z-index: 10;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            transition: transform 0.1s;
         }
 
-        /* Spribe Badge Simulation */
-        .spribe-badge {
-            background-color: rgba(42, 46, 51, 0.8);
-            border: 1px solid #4b5563;
-            border-radius: 8px;
-            padding: 5px 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 10px;
-            color: #d1d5db;
+        .status-text {
+            font-size: 14px;
+            color: #a0a0a0;
+            margin-top: 10px;
+            z-index: 10;
         }
 
-        .spribe-badge .check {
-            color: #10b981;
-        }
-
-        /* Plane silhouette */
-        .plane-silhouette {
+        .plane {
             position: absolute;
-            top: 30px;
+            font-size: 40px;
+            bottom: 20px;
             left: 20px;
-            color: #e02434;
-            transform: rotate(-15deg);
+            transition: all 0.5s linear;
+            opacity: 0;
         }
 
-        /* Betting Controls */
-        .betting-controls {
-            padding: 15px;
+        .controls {
+            padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            flex-grow: 1;
             background-color: #1a1d21;
         }
 
-        .control-row {
-            background-color: #23272b;
-            border-radius: 10px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toggle-tabs {
-            display: flex;
-            background-color: #121418;
-            border-radius: 20px;
-            padding: 4px;
-        }
-
-        .toggle-tab {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            font-size: 14px;
-            color: #a0a0a0;
-            cursor: pointer;
-            border-radius: 16px;
-        }
-
-        .toggle-tab.active {
-            background-color: #2d3238;
-            color: white;
-        }
-
-        .input-area {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .amount-input-wrapper {
-            display: flex;
-            align-items: center;
-            background-color: #121418;
-            border-radius: 8px;
-            padding: 5px;
-            flex: 1;
-        }
-
-        .amount-btn {
-            background: none;
-            border: none;
-            color: #a0a0a0;
-            font-size: 20px;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            border-radius: 50%;
-        }
-
-        .amount-btn:hover {
-            background-color: #2a2e33;
-        }
-
-        .amount-display {
-            flex: 1;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            background: none;
-            border: none;
-            color: white;
-            outline: none;
-        }
-
-        .bet-button {
+        .bet-btn {
             background-color: #22c55e;
             color: white;
             border: none;
             border-radius: 10px;
-            padding: 15px 20px;
-            font-size: 18px;
+            padding: 20px;
+            font-size: 20px;
             font-weight: bold;
-            width: 150px;
             cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.1s;
+            transition: background-color 0.2s;
         }
 
-        .bet-button:active {
-            transform: scale(0.98);
+        .bet-btn:disabled {
+            background-color: #4b5563;
+            cursor: not-allowed;
         }
-
-        .bet-button.cancel {
-            background-color: #e02434;
+        
+        .cashout-btn {
+            background-color: #f59e0b;
         }
-
-        .bet-button .amount {
-            font-size: 14px;
-            font-weight: normal;
-        }
-
-        .quick-chips {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            padding-top: 5px;
-        }
-
-        .chip {
-            background-color: #121418;
-            border: none;
-            color: #a0a0a0;
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .chip:hover {
-            background-color: #2a2e33;
-            color: white;
-        }
-
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- Top Header -->
-    <div class="top-header">
-        <a href="#" class="back-btn">&lt; <span>Go Back</span></a>
-        <div class="fullscreen-btn">View Fullscreen [ ]</div>
+    <div class="header">
+        <div>KURGAT</div>
+        <div class="balance">1,000.00 KES</div>
     </div>
 
-    <!-- Sub Header -->
-    <div class="sub-header">
-        <div class="plane-icon">✈</div>
-        <div class="balance" id="balance">0.00 KES</div>
-        <div>≡</div>
-    </div>
-
-    <!-- Live Multiplier History -->
-    <div class="history-bar" id="history-bar">
-        <span class="history-item">1.00x</span>
-        <span class="history-item">5.35x</span>
-        <span class="history-item">6.34x</span>
-        <span class="history-item">1.44x</span>
-        <span class="history-item">2.26x</span>
-        <span class="history-item">1.01x</span>
-        <span class="history-item">3.42x</span>
-        <span class="history-item">1.55x</span>
-    </div>
-
-    <!-- Game Area -->
     <div class="game-area">
-        <div class="plane-silhouette">✈</div>
-        
-        <!-- Branding Replaced with KURGAT -->
-        <div class="brand-title">KURGAT</div>
-        <div class="brand-subtitle">OFFICIAL PARTNERS</div>
-        
-        <div class="spribe-badge">
-            <div>OFFICIAL GAME <span class="check">✔</span></div>
-            <div style="font-size: 8px; margin-top: 2px;">Since 2019</div>
-        </div>
+        <div class="plane" id="plane">✈️</div>
+        <div class="multiplier-display" id="multiplier">1.00x</div>
+        <div class="status-text" id="status">Waiting for next round...</div>
     </div>
 
-    <!-- Betting Controls -->
-    <div class="betting-controls">
-        
-        <!-- First Bet Panel -->
-        <div class="control-row">
-            <div class="toggle-tabs">
-                <div class="toggle-tab active">Bet</div>
-                <div class="toggle-tab">Auto</div>
-            </div>
-            <div class="input-area">
-                <div class="amount-input-wrapper">
-                    <button class="amount-btn" onclick="updateAmount(0, -10)">−</button>
-                    <input type="text" class="amount-display" id="bet-amount-1" value="10.00" readonly>
-                    <button class="amount-btn" onclick="updateAmount(0, 10)">+</button>
-                </div>
-                <button class="bet-button" id="bet-btn-1" onclick="toggleBet(0)">
-                    <span id="bet-text-1">Bet</span>
-                    <span class="amount" id="bet-btn-amount-1">10.00 KES</span>
-                </button>
-            </div>
-            <div class="quick-chips">
-                <button class="chip" onclick="setAmount(0, 100)">100</button>
-                <button class="chip" onclick="setAmount(0, 250)">250</button>
-                <button class="chip" onclick="setAmount(0, 1000)">1,000</button>
-                <button class="chip" onclick="setAmount(0, 25000)">25,000</button>
-            </div>
-        </div>
-
-        <!-- Second Bet Panel -->
-        <div class="control-row">
-            <div class="toggle-tabs">
-                <div class="toggle-tab active">Bet</div>
-                <div class="toggle-tab">Auto</div>
-            </div>
-            <div class="input-area">
-                <div class="amount-input-wrapper">
-                    <button class="amount-btn" onclick="updateAmount(1, -10)">−</button>
-                    <input type="text" class="amount-display" id="bet-amount-2" value="10.00" readonly>
-                    <button class="amount-btn" onclick="updateAmount(1, 10)">+</button>
-                </div>
-                <button class="bet-button" id="bet-btn-2" onclick="toggleBet(1)">
-                    <span id="bet-text-2">Bet</span>
-                    <span class="amount" id="bet-btn-amount-2">10.00 KES</span>
-                </button>
-            </div>
-            <div class="quick-chips">
-                <button class="chip" onclick="setAmount(1, 100)">100</button>
-                <button class="chip" onclick="setAmount(1, 250)">250</button>
-                <button class="chip" onclick="setAmount(1, 1000)">1,000</button>
-                <button class="chip" onclick="setAmount(1, 25000)">25,000</button>
-            </div>
-        </div>
-
+    <div class="controls">
+        <button class="bet-btn" id="actionBtn" onclick="handleAction()">Bet</button>
     </div>
 </div>
 
 <script>
-    // --- Logic for Buttons and Inputs ---
+    // --- DISCLAIMER: This is purely a visual simulation for educational purposes. ---
+    // --- It does not reflect real gambling mechanics or provably fair algorithms. ---
 
-    let betAmounts = [10.00, 10.00];
-    let isBetting = [false, false];
+    let currentMultiplier = 1.00;
+    let gameInterval;
+    let isPlaying = false;
+    let hasBet = false;
+    let planeElement = document.getElementById('plane');
+    let multiplierDisplay = document.getElementById('multiplier');
+    let statusText = document.getElementById('status');
+    let actionBtn = document.getElementById('actionBtn');
 
-    // Update the input field and the button text
-    function updateUI(index) {
-        document.getElementById(`bet-amount-${index + 1}`).value = betAmounts[index].toFixed(2);
-        document.getElementById(`bet-btn-amount-${index + 1}`).innerText = `${betAmounts[index].toFixed(2)} KES`;
+    // Function to generate a random crash point for the simulation
+    function getRandomCrashPoint() {
+        // A simplified, unrealistic curve to make the game look interesting
+        let rand = Math.random();
+        if (rand < 0.4) return 1 + (Math.random() * 1.5); // Crashes early (1.0x - 2.5x)
+        if (rand < 0.8) return 2 + (Math.random() * 5);   // Crashes mid (2.0x - 7.0x)
+        return 7 + (Math.random() * 20);                  // Crashes high (7.0x+)
     }
 
-    // Increase or decrease amount
-    function updateAmount(index, amount) {
-        if (isBetting[index]) return; // Prevent changing amount while betting
-        betAmounts[index] += amount;
-        if (betAmounts[index] < 10) betAmounts[index] = 10; // Minimum bet
-        updateUI(index);
-    }
-
-    // Set exact amount from quick chips
-    function setAmount(index, amount) {
-        if (isBetting[index]) return;
-        betAmounts[index] = amount;
-        updateUI(index);
-    }
-
-    // Toggle Bet/Cancel state
-    function toggleBet(index) {
-        isBetting[index] = !isBetting[index];
-        const btn = document.getElementById(`bet-btn-${index + 1}`);
-        const text = document.getElementById(`bet-text-${index + 1}`);
+    function startRound() {
+        isPlaying = true;
+        hasBet = false;
+        currentMultiplier = 1.00;
+        let crashPoint = getRandomCrashPoint();
         
-        if (isBetting[index]) {
-            btn.classList.add('cancel');
-            text.innerText = "Cancel";
+        multiplierDisplay.style.color = '#fff';
+        multiplierDisplay.innerText = '1.00x';
+        statusText.innerText = 'Round in progress...';
+        actionBtn.innerText = 'Cash Out (1.00x)';
+        actionBtn.className = 'bet-btn cashout-btn';
+        
+        // Reset plane position
+        planeElement.style.opacity = '1';
+        planeElement.style.bottom = '20px';
+        planeElement.style.left = '20px';
+        planeElement.style.transform = 'rotate(0deg)';
+
+        gameInterval = setInterval(() => {
+            // Increment multiplier (simulating game logic)
+            currentMultiplier += 0.05 + (currentMultiplier * 0.01); 
+            
+            multiplierDisplay.innerText = currentMultiplier.toFixed(2) + 'x';
+
+            // Animate plane flying up and right
+            let bottom = parseFloat(planeElement.style.bottom) + 2;
+            let left = parseFloat(planeElement.style.left) + 1.5;
+            planeElement.style.bottom = bottom + 'px';
+            planeElement.style.left = left + 'px';
+            planeElement.style.transform = `rotate(${left / 2}deg)`;
+
+            // Check if the round should crash
+            if (currentMultiplier >= crashPoint) {
+                endRound(false); // Crashed
+            }
+        }, 100); // Updates every 100ms
+    }
+
+    function endRound(wasCashedOut) {
+        clearInterval(gameInterval);
+        isPlaying = false;
+        
+        if (wasCashedOut) {
+            statusText.innerText = `You won! Cashed out at ${currentMultiplier.toFixed(2)}x`;
+            multiplierDisplay.style.color = '#4ade80'; // Green for win
         } else {
-            btn.classList.remove('cancel');
-            text.innerText = "Bet";
+            statusText.innerText = `Crashed at ${currentMultiplier.toFixed(2)}x!`;
+            multiplierDisplay.style.color = '#e02434'; // Red for crash
+            multiplierDisplay.innerText = `${currentMultiplier.toFixed(2)}x`;
+        }
+
+        // Reset plane
+        planeElement.style.opacity = '0';
+        
+        // Reset button for next round
+        actionBtn.innerText = 'Bet';
+        actionBtn.className = 'bet-btn';
+        actionBtn.disabled = false;
+
+        // Automatically start a new round after a short delay
+        setTimeout(() => {
+            if (!isPlaying) {
+                 statusText.innerText = 'Waiting for next round...';
+                 multiplierDisplay.style.color = '#fff';
+                 multiplierDisplay.innerText = '1.00x';
+                 // In a real game, a countdown would happen here
+                 setTimeout(startRound, 2000); 
+            }
+        }, 3000);
+    }
+
+    function handleAction() {
+        if (!isPlaying) {
+            // If game isn't playing, bet starts the round (simulation)
+            startRound();
+            hasBet = true;
+            actionBtn.innerText = 'Cash Out (1.00x)';
+            actionBtn.className = 'bet-btn cashout-btn';
+        } else if (isPlaying && hasBet) {
+            // If currently playing and has a bet, cash out
+            hasBet = false;
+            endRound(true);
         }
     }
 
-    // --- Live History Simulation ---
-    
-    // Simulate random multipliers appearing in the top bar
-    setInterval(() => {
-        const historyBar = document.getElementById('history-bar');
-        const newMultiplier = (Math.random() * 8 + 1).toFixed(2) + 'x';
-        
-        const newSpan = document.createElement('span');
-        newSpan.className = 'history-item';
-        newSpan.innerText = newMultiplier;
-        
-        // Randomize color
-        const colors = ['#8b5cf6', '#3b82f6', '#f59e0b', '#10b981'];
-        newSpan.style.color = colors[Math.floor(Math.random() * colors.length)];
-
-        historyBar.appendChild(newSpan);
-        
-        // Keep the history bar from overflowing endlessly
-        if (historyBar.children.length > 15) {
-            historyBar.removeChild(historyBar.firstChild);
-        }
-    }, 3000); // Adds a new number every 3 seconds
+    // Start the very first round after a brief load
+    setTimeout(startRound, 1000);
 
 </script>
-
 </body>
-  </html>
+</html>
