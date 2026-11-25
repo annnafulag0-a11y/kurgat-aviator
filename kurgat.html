@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KURGAT - Game</title>
+    <style>
+        /* Basic Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: white;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Mobile Container */
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            background-color: #1a1d21;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Top Header */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #0f1114;
+            font-size: 14px;
+            border-bottom: 1px solid #2a2e33;
+        }
+
+        .back-btn {
+            color: #a0a0a0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .back-btn span {
+            margin-left: 5px;
+        }
+
+        .fullscreen-btn {
+            color: #a0a0a0;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Sub Header (Balance & History) */
+        .sub-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #1a1d21;
+        }
+
+        .plane-icon {
+            color: #e02434;
+            font-size: 20px;
+        }
+
+        .balance {
+            color: #4ade80;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .history-bar {
+            display: flex;
+            gap: 10px;
+            padding: 10px 15px;
+            background-color: #1a1d21;
+            font-size: 12px;
+            overflow-x: auto;
+            border-bottom: 1px solid #2a2e33;
+        }
+
+        .history-item {
+            color: #8b5cf6;
+        }
+
+        .history-item:nth-child(odd) {
+            color: #3b82f6;
+        }
+        
+        .history-item:nth-child(3n) {
+            color: #f59e0b;
+        }
+
+        /* Main Game Area */
+        .game-area {
+            background: radial-gradient(circle, #2a2e33 0%, #0a0a0a 100%);
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border-bottom: 2px solid #2a2e33;
+        }
+
+        /* KURGAT Branding */
+        .brand-title {
+            font-size: 36px;
+            font-weight: 900;
+            color: #e02434;
+            font-style: italic;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .brand-subtitle {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        /* Spribe Badge Simulation */
+        .spribe-badge {
+            background-color: rgba(42, 46, 51, 0.8);
+            border: 1px solid #4b5563;
+            border-radius: 8px;
+            padding: 5px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 10px;
+            color: #d1d5db;
+        }
+
+        .spribe-badge .check {
+            color: #10b981;
+        }
+
+        /* Plane silhouette */
+        .plane-silhouette {
+            position: absolute;
+            top: 30px;
+            left: 20px;
+            color: #e02434;
+            transform: rotate(-15deg);
+        }
+
+        /* Betting Controls */
+        .betting-controls {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-grow: 1;
+            background-color: #1a1d21;
+        }
+
+        .control-row {
+            background-color: #23272b;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toggle-tabs {
+            display: flex;
+            background-color: #121418;
+            border-radius: 20px;
+            padding: 4px;
+        }
+
+        .toggle-tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            color: #a0a0a0;
+            cursor: pointer;
+            border-radius: 16px;
+        }
+
+        .toggle-tab.active {
+            background-color: #2d3238;
+            color: white;
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .amount-input-wrapper {
+            display: flex;
+            align-items: center;
+            background-color: #121418;
+            border-radius: 8px;
+            padding: 5px;
+            flex: 1;
+        }
+
+        .amount-btn {
+            background: none;
+            border: none;
+            color: #a0a0a0;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .amount-btn:hover {
+            background-color: #2a2e33;
+        }
+
+        .amount-display {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            background: none;
+            border: none;
+            color: white;
+            outline: none;
+        }
+
+        .bet-button {
+            background-color: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            width: 150px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        .bet-button:active {
+            transform: scale(0.98);
+        }
+
+        .bet-button.cancel {
+            background-color: #e02434;
+        }
+
+        .bet-button .amount {
+            font-size: 14px;
+            font-weight: normal;
+        }
+
+        .quick-chips {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding-top: 5px;
+        }
+
+        .chip {
+            background-color: #121418;
+            border: none;
+            color: #a0a0a0;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .chip:hover {
+            background-color: #2a2e33;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Top Header -->
+    <div class="top-header">
+        <a href="#" class="back-btn">&lt; <span>Go Back</span></a>
+        <div class="fullscreen-btn">View Fullscreen [ ]</div>
+    </div>
+
+    <!-- Sub Header -->
+    <div class="sub-header">
+        <div class="plane-icon">✈</div>
+        <div class="balance" id="balance">0.00 KES</div>
+        <div>≡</div>
+    </div>
+
+    <!-- Live Multiplier History -->
+    <div class="history-bar" id="history-bar">
+        <span class="history-item">1.00x</span>
+        <span class="history-item">5.35x</span>
+        <span class="history-item">6.34x</span>
+        <span class="history-item">1.44x</span>
+        <span class="history-item">2.26x</span>
+        <span class="history-item">1.01x</span>
+        <span class="history-item">3.42x</span>
+        <span class="history-item">1.55x</span>
+    </div>
+
+    <!-- Game Area -->
+    <div class="game-area">
+        <div class="plane-silhouette">✈</div>
+        
+        <!-- Branding Replaced with KURGAT -->
+        <div class="brand-title">KURGAT</div>
+        <div class="brand-subtitle">OFFICIAL PARTNERS</div>
+        
+        <div class="spribe-badge">
+            <div>OFFICIAL GAME <span class="check">✔</span></div>
+            <div style="font-size: 8px; margin-top: 2px;">Since 2019</div>
+        </div>
+    </div>
+
+    <!-- Betting Controls -->
+    <div class="betting-controls">
+        
+        <!-- First Bet Panel -->
+        <div class="control-row">
+            <div class="toggle-tabs">
+                <div class="toggle-tab active">Bet</div>
+                <div class="toggle-tab">Auto</div>
+            </div>
+            <div class="input-area">
+                <div class="amount-input-wrapper">
+                    <button class="amount-btn" onclick="updateAmount(0, -10)">−</button>
+                    <input type="text" class="amount-display" id="bet-amount-1" value="10.00" readonly>
+                    <button class="amount-btn" onclick="updateAmount(0, 10)">+</button>
+                </div>
+                <button class="bet-button" id="bet-btn-1" onclick="toggleBet(0)">
+                    <span id="bet-text-1">Bet</span>
+                    <span class="amount" id="bet-btn-amount-1">10.00 KES</span>
+                </button>
+            </div>
+            <div class="quick-chips">
+                <button class="chip" onclick="setAmount(0, 100)">100</button>
+                <button class="chip" onclick="setAmount(0, 250)">250</button>
+                <button class="chip" onclick="setAmount(0, 1000)">1,000</button>
+                <button class="chip" onclick="setAmount(0, 25000)">25,000</button>
+            </div>
+        </div>
+
+        <!-- Second Bet Panel -->
+        <div class="control-row">
+            <div class="toggle-tabs">
+                <div class="toggle-tab active">Bet</div>
+                <div class="toggle-tab">Auto</div>
+            </div>
+            <div class="input-area">
+                <div class="amount-input-wrapper">
+                    <button class="amount-btn" onclick="updateAmount(1, -10)">−</button>
+                    <input type="text" class="amount-display" id="bet-amount-2" value="10.00" readonly>
+                    <button class="amount-btn" onclick="updateAmount(1, 10)">+</button>
+                </div>
+                <button class="bet-button" id="bet-btn-2" onclick="toggleBet(1)">
+                    <span id="bet-text-2">Bet</span>
+                    <span class="amount" id="bet-btn-amount-2">10.00 KES</span>
+                </button>
+            </div>
+            <div class="quick-chips">
+                <button class="chip" onclick="setAmount(1, 100)">100</button>
+                <button class="chip" onclick="setAmount(1, 250)">250</button>
+                <button class="chip" onclick="setAmount(1, 1000)">1,000</button>
+                <button class="chip" onclick="setAmount(1, 25000)">25,000</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // --- Logic for Buttons and Inputs ---
+
+    let betAmounts = [10.00, 10.00];
+    let isBetting = [false, false];
+
+    // Update the input field and the button text
+    function updateUI(index) {
+        document.getElementById(`bet-amount-${index + 1}`).value = betAmounts[index].toFixed(2);
+        document.getElementById(`bet-btn-amount-${index + 1}`).innerText = `${betAmounts[index].toFixed(2)} KES`;
+    }
+
+    // Increase or decrease amount
+    function updateAmount(index, amount) {
+        if (isBetting[index]) return; // Prevent changing amount while betting
+        betAmounts[index] += amount;
+        if (betAmounts[index] < 10) betAmounts[index] = 10; // Minimum bet
+        updateUI(index);
+    }
+
+    // Set exact amount from quick chips
+    function setAmount(index, amount) {
+        if (isBetting[index]) return;
+        betAmounts[index] = amount;
+        updateUI(index);
+    }
+
+    // Toggle Bet/Cancel state
+    function toggleBet(index) {
+        isBetting[index] = !isBetting[index];
+        const btn = document.getElementById(`bet-btn-${index + 1}`);
+        const text = document.getElementById(`bet-text-${index + 1}`);
+        
+        if (isBetting[index]) {
+            btn.classList.add('cancel');
+            text.innerText = "Cancel";
+        } else {
+            btn.classList.remove('cancel');
+            text.innerText = "Bet";
+        }
+    }
+
+    // --- Live History Simulation ---
+    
+    // Simulate random multipliers appearing in the top bar
+    setInterval(() => {
+        const historyBar = document.getElementById('history-bar');
+        const newMultiplier = (Math.random() * 8 + 1).toFixed(2) + 'x';
+        
+        const newSpan = document.createElement('span');
+        newSpan.className = 'history-item';
+        newSpan.innerText = newMultiplier;
+        
+        // Randomize color
+        const colors = ['#8b5cf6', '#3b82f6', '#f59e0b', '#10b981'];
+        newSpan.style.color = colors[Math.floor(Math.random() * colors.length)];
+
+        historyBar.appendChild(newSpan);
+        
+        // Keep the history bar from overflowing endlessly
+        if (historyBar.children.length > 15) {
+            historyBar.removeChild(historyBar.firstChild);
+        }
+    }, 3000); // Adds a new number every 3 seconds
+
+</script>
+
+</body>
+  </html>
